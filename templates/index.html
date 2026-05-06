@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Simple Flask App</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f7fb;
+        --surface: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #d1d5db;
+        --accent: #2563eb;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 24px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      }
+
+      .header {
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      form {
+        display: flex;
+        gap: 12px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      input[type="text"] {
+        flex: 1;
+        min-width: 220px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 16px;
+      }
+
+      input[type="email"],
+      textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 16px;
+        font-family: inherit;
+        box-sizing: border-box;
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .field-group {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .field-label {
+        font-weight: 700;
+      }
+
+      button {
+        padding: 12px 18px;
+        border: 0;
+        border-radius: 8px;
+        background: var(--accent);
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+      }
+
+      th, td {
+        text-align: left;
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      th {
+        background: #f9fafb;
+      }
+
+      .empty {
+        padding: 16px;
+        color: var(--muted);
+      }
+
+      .error {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 8px;
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+      }
+
+      .section-title {
+        margin: 28px 0 8px;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <section class="card">
+        <div class="header">
+          <h1>Simple Flask App</h1>
+          <p>Search the records stored in the backend JSON file, or access the raw API at /api.</p>
+        </div>
+
+        <form method="get" action="/">
+          <input type="text" name="q" value="{{ search_query }}" placeholder="Search by name, role, or id">
+          <button type="submit">Search</button>
+        </form>
+
+        <h2 class="section-title">Submit data to MongoDB Atlas</h2>
+        <form method="post" action="/submit">
+          <input type="hidden" name="q" value="{{ search_query }}">
+          <div class="field-group">
+            <label class="field-label" for="name">Name</label>
+            <input id="name" type="text" name="name" value="{{ form_data.name }}" placeholder="Enter your name">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="email">Email</label>
+            <input id="email" type="email" name="email" value="{{ form_data.email }}" placeholder="Enter your email">
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Enter your message">{{ form_data.message }}</textarea>
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+
+        {% if error_message %}
+          <div class="error">{{ error_message }}</div>
+        {% endif %}
+
+        {% if records %}
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for record in records %}
+                <tr>
+                  <td>{{ record.id }}</td>
+                  <td>{{ record.name }}</td>
+                  <td>{{ record.role }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <div class="empty">No records found.</div>
+        {% endif %}
+      </section>
+    </main>
+  </body>
+</html>
